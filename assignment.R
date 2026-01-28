@@ -9,8 +9,8 @@ library(factoextra)
 # 1. отберите 6 главных персонажей (по количеству реплик)
 # сохраните как символьный вектор
 top_speakers <- friends |> 
-  count(speaker, sort = TRUE) |> 
-  slice_head(n = 6) |> 
+  count(speaker, sort = TRUE) |>
+  slice(1:6) |>
   pull(speaker)
   
 # 2. отфильтруйте топ-спикеров, 
@@ -18,42 +18,38 @@ top_speakers <- friends |>
 # столбец с токенами должен называться word
 # оставьте только столбцы speaker, word
 friends_tokens <- friends |> 
-  filter(speaker %in% top_speakers) |> 
-  unnest_tokens(word, text) |> 
-  filter(!str_detect(word, "\\d")) |> 
+  filter(speaker %in% top_speakers) |>
+  unnest_tokens(word, text) |>
+  mutate(word = str_remove_all(word, "\\d+")) |>
+  filter(word != "") |>
   select(speaker, word)
 
 # 3. отберите по 500 самых частотных слов для каждого персонажа
 # посчитайте относительные частотности для слов
 friends_tf <- friends_tokens |>
-  count(speaker, word, sort = TRUE) |> 
-  group_by(speaker) |> 
-  slice_max(n, n = 500, with_ties = FALSE) |> 
-  mutate(tf = n / sum(n)) |> 
-  ungroup() |> 
+  count(speaker, word) |>
+  group_by(speaker) |>
+  arrange(desc(n)) |>
+  slice_head(n = 500) |>
+  mutate(tf = n / sum(n)) |>
+  ungroup() |>
   select(speaker, word, tf)
 
 # 4. преобразуйте в широкий формат; 
 # столбец c именем спикера превратите в имя ряда, используя подходящую функцию 
 friends_tf_wide <- friends_tf |> 
-  pivot_wider(
-    names_from = word,
-    values_from = tf,
-    values_fill = 0
-  ) |> 
+  pivot_wider(names_from = word, values_from = tf, values_fill = 0) |>
   column_to_rownames("speaker")
 
-friends_tf_wide <- friends_tf_wide[sort(rownames(friends_tf_wide)), ]
-friends_tf_wide <- friends_tf_wide[, sort(colnames(friends_tf_wide))]
+
 
 # 5. установите зерно 123
 # проведите кластеризацию k-means (k = 3) на относительных значениях частотности (nstart = 20)
 # используйте scale()
 
-scaled_data <- scale(friends_tf_wide)
 set.seed(123)
 km.out <- kmeans(
-  scaled_data,
+  scale(friends_tf_wide),
   centers = 3,
   nstart = 20
 )
@@ -62,9 +58,9 @@ km.out <- kmeans(
 # 6. примените к матрице метод главных компонент (prcomp)
 # центрируйте и стандартизируйте, использовав аргументы функции
 pca_fit <- prcomp(
-  scaled_data,
+  friends_tf_wide,
   center = TRUE,
-  scale. = FALSE
+  scale. = TRUE
 )
 
 # 7. Покажите наблюдения и переменные вместе (биплот)
@@ -74,12 +70,14 @@ pca_fit <- prcomp(
 # сохраните график как переменную q
 
 q <- fviz_pca_biplot(
+  fviz_pca_biplot(
   pca_fit,
   geom = "text",
   label = "ind",
-  col.ind = factor(km.out$cluster),
+  habillage = as.factor(km.out$cluster),
+  select.var = list(cos2 = 20),
   repel = TRUE,
-  select.var = list(cos2 = 20)
+  ggtheme = theme_minimal()
 )
 
 
