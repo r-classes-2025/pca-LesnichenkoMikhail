@@ -71,7 +71,7 @@ pca_fit <- prcomp(
 
 q <- fviz_pca_biplot(
   pca_fit,
-  geom = "text",
+  geom = c("text"),
   label = "ind",
   habillage = as.factor(km.out$cluster),
   select.var = list(cos2 = 20),
