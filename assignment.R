@@ -42,6 +42,9 @@ friends_tf_wide <- friends_tf |>
   ) |> 
   column_to_rownames("speaker")
 
+friends_tf_wide <- friends_tf_wide[sort(rownames(friends_tf_wide)), ]
+friends_tf_wide <- friends_tf_wide[, sort(colnames(friends_tf_wide))]
+
 # 5. установите зерно 123
 # проведите кластеризацию k-means (k = 3) на относительных значениях частотности (nstart = 20)
 # используйте scale()
