@@ -70,7 +70,6 @@ pca_fit <- prcomp(
 # сохраните график как переменную q
 
 q <- fviz_pca_biplot(
-  fviz_pca_biplot(
   pca_fit,
   geom = "text",
   label = "ind",
