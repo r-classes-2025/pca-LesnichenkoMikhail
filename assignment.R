@@ -29,11 +29,12 @@ friends_tokens <- friends |>
 friends_tf <- friends_tokens |>
   count(speaker, word) |>
   group_by(speaker) |>
+  mutate(tf = n / sum(n)) |>
   arrange(desc(n)) |>
   slice_head(n = 500) |>
-  mutate(tf = n / sum(n)) |>
   ungroup() |>
   select(speaker, word, tf)
+
 
 # 4. преобразуйте в широкий формат; 
 # столбец c именем спикера превратите в имя ряда, используя подходящую функцию 
