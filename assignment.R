@@ -46,7 +46,7 @@ friends_tf_wide <- friends_tf |>
 # проведите кластеризацию k-means (k = 3) на относительных значениях частотности (nstart = 20)
 # используйте scale()
 
-
+scaled_data <- scale(friends_tf_wide)
 set.seed(123)
 km.out <- kmeans(
   scale(friends_tf_wide),
@@ -72,7 +72,7 @@ pca_fit <- prcomp(
 q <- fviz_pca_biplot(
   pca_fit,
   geom = "text",
-  label = "var",
+  label = "ind",
   col.ind = factor(km.out$cluster),
   repel = TRUE,
   select.var = list(cos2 = 20)
