@@ -49,7 +49,7 @@ friends_tf_wide <- friends_tf |>
 scaled_data <- scale(friends_tf_wide)
 set.seed(123)
 km.out <- kmeans(
-  scale(friends_tf_wide),
+  scaled_data,
   centers = 3,
   nstart = 20
 )
@@ -58,9 +58,9 @@ km.out <- kmeans(
 # 6. примените к матрице метод главных компонент (prcomp)
 # центрируйте и стандартизируйте, использовав аргументы функции
 pca_fit <- prcomp(
-  friends_tf_wide,
+  scaled_data,
   center = TRUE,
-  scale. = TRUE
+  scale. = FALSE
 )
 
 # 7. Покажите наблюдения и переменные вместе (биплот)
