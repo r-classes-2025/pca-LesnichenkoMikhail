@@ -5,6 +5,7 @@ library(tidytext)
 library(factoextra) 
 
 
+
 # 1. отберите 6 главных персонажей (по количеству реплик)
 # сохраните как символьный вектор
 top_speakers <- friends |> 
